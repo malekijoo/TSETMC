@@ -61,7 +61,7 @@ def bunch_(driver, soup):
                     check_and_store(instance)
                     shares_names.remove(data[0])
         except exceptions.StaleElementReferenceException as e:
-            print(e)
+            # print(e)
             pass
     print(" '{}' share successfully saved in dataframe.".format(instance.counter()))
     return shares_names
@@ -76,11 +76,11 @@ def single(sh_list):
 
     while True:
 
-        if 1 < loop_ < 5 and len(sh_list) != 0:
+        if 1 < loop_ < 4 and len(sh_list) != 0:
             sh_list = next_phase
         next_phase = []
         pbar = tqdm(sh_list, ncols=100)
-        pbar.write("Processing the list of share which is not in the original page. \n")
+        pbar.write("\nProcessing the list of share which is not in the original page. \n")
         for ii, _ in enumerate(pbar, 0):
             time_temp = pd.datetime.now()
             min_ = time_temp.minute
@@ -95,11 +95,9 @@ def single(sh_list):
                 html, sh_driver = page.shares_page
                 soup = bs(html, 'html.parser')
                 time.sleep(1)
-                if not owss.check_share_condition(soup, sh_driver):
-                    print('this share ({}) is stopped for some reason.'.format(name))
-
+                # if not owss.check_share_condition(soup, sh_driver):
+                #     # print('this share ({}) is stopped for some reason.'.format(name))
                 df = owss.making_data_prepared(soup, homepage, usd, sh_driver)
-                # print(df)
                 share = owss.StockShare(**df)
                 check_and_store(share)
 
@@ -111,4 +109,7 @@ def single(sh_list):
         if len(next_phase) == 0:
             print('***          the list of single share is now covered.         ***')
             break
+        if loop_ == 3:
+            print('these share does not respond correctly, we will back to them during next phase')
+            print(next_phase)
 

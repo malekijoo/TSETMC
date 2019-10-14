@@ -21,7 +21,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
-
 url = 'http://www.tsetmc.com/'
 if 'posix' in os.name:
     ch_path = "/usr/local/bin/chromedriver"
@@ -33,12 +32,9 @@ if 'posix' in os.name:
 elif 'nt' in os.name:
     path = "C:\\Users\\{}\\Desktop\\start\\".format(str(getpass.getuser()))
 
-
 """
-
 Functions in this section is employed to check 
 different element and conditions.
-
 """
 
 
@@ -145,8 +141,7 @@ def find_last_today_entry(name_, path_=path, filename='dataframe.xlsx'):
 
         else:
             return None
-    else:
-        print('there is no record !!!! ')
+
 
 
 def find_last_data_feature(name_, path_=path, filename='dataframe.xlsx'):
@@ -160,7 +155,6 @@ def find_last_data_feature(name_, path_=path, filename='dataframe.xlsx'):
             for i in range(len(dff.index) - 1):
                 if max_ < dff['datetime'][i + 1]:
                     max_ = dff['datetime'][i + 1]
-
             dp = df.loc[df['datetime'] == max_]
             dic = dp.to_dict('list')
             return dic
@@ -209,13 +203,11 @@ class StockShare(object):
         self.today = today
         self.name = name
 
-
 """
 In the below section we have class and functions that 
 try to load the page. Beside them, at the end of
 this section, there is a function to check the position
 of some elements in the driver file.
-
 """
 
 
@@ -418,7 +410,6 @@ class Info:
         print(T.trade_info()[0])
 
         :return a raw information list:
-
         """
         check_page(self.soup, 'sharepage')
         sale_q = 0
@@ -438,9 +429,6 @@ class Info:
         except:
             try:
                 trade = self.soup.find('tbody', {'id': 'bl'})
-
-                time.sleep(1)
-
                 amount_rows = trade.find_all("tr")
                 for i in range(2, 5):
 
@@ -465,9 +453,7 @@ class Info:
         """
         must be share page
         to do : check page
-
         :return:
-
         """
         check_page(self.soup, 'sharepage')
         trade = self.soup.find_all('div', {'class': 'box6 h80'})
@@ -497,7 +483,6 @@ class Info:
                 ydp = repair_value(table_contents[3][2])[0]
                 first_price = repair_value(table_contents[3][0])[0]
                 condition = 'مجاز'
-
             else:
                 price = rm_comma(table_contents[1])[1][0]
                 temp = rm_comma(table_contents[3])
@@ -517,7 +502,7 @@ class Info:
                 price = f[0]
             else:
                 f = self.driver.find_element_by_xpath('//*[@id="d02"]').text.replace(',', '')
-                print(f)
+                # print(f)
                 price = float(f)
             ydp = float(self.driver.find_element_by_xpath('//*[@id="d05"]').text.replace(',', ''))
 
@@ -553,7 +538,6 @@ class Info:
         """
         share page
         :return: jkdfngj
-
         """
         eps = self.soup.find_all(text='EPS')
         eps_ = eps[1].parent.parent.parent
@@ -598,12 +582,10 @@ class Info:
 
     @property
     def data_history(self):
-
         """
         must be on sabeghe page
         to do : check page
         :return:
-
         """
         check_page(self.soup, 'historypage')
 
@@ -628,11 +610,11 @@ def get_name(soup, driver):
 
 
 def tepixx(homepage, driver, name):
+
     inf1 = Info(homepage)
     z = inf1.homepage_table(Tarnama.get('BDYN'))
     temp = rm_comma(z[0][1].split(' '))
     tepix_ = temp[0][0]
-
     if float(tepix_) < 100:
         tepix_ = 0
         try:
@@ -641,7 +623,6 @@ def tepixx(homepage, driver, name):
             temp1 = te.text.split()
             tepix_ = temp1[0].split(':')[1]
             tepix_ = rm_comma(tepix_)
-
         except:
             element = find_last_today_entry(name_=name)
             if element is not None:
@@ -660,9 +641,7 @@ def making_data_prepared(soup, homepage, usd, sh_driver):
         tepix = tepixx(homepage, sh_driver, sh_name)
     except:
         pass
-
     element = find_last_today_entry(name_=sh_name)
-
     try:
         if element is None or not element['price']:
             change = sh_dic['price'] - sh_dic['ydp']
@@ -672,7 +651,6 @@ def making_data_prepared(soup, homepage, usd, sh_driver):
             last_price = element['price'][0]
             change = sh_dic['price'] - last_price
             change_per = change / last_price
-
     except TypeError:
         if element is None or not element['price']:
             if sh_driver.find_element_by_xpath('//*[@id="d02"]').text.count(' ') > 1:
@@ -692,7 +670,7 @@ def making_data_prepared(soup, homepage, usd, sh_driver):
             else:
                 kk = rm_comma(sh_driver.find_element_by_xpath('//*[@id="d02"]').text)
             change = kk - last_price
-            change_per = change / last_price
+            change_per = round((change / last_price) * 100, 2)
 
     dic = {'name': sh_name,
            'price': sh_dic['price'],
