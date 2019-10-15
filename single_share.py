@@ -62,7 +62,7 @@ def check_share_condition(soup, driver):
     t = t.get_text()
     if len(t) == 5:
         t = driver.find_element_by_xpath('//*[@id="d01"]').text
-        time.sleep(1)
+        # time.sleep(1)
     if 'مجاز' in t:
         return True
     else:
@@ -618,7 +618,7 @@ def tepixx(homepage, driver, name):
     if float(tepix_) < 100:
         tepix_ = 0
         try:
-            time.sleep(1)
+            # time.sleep(1)
             te = driver.find_element_by_xpath('//*[@id="FastView"]/span[1]')
             temp1 = te.text.split()
             tepix_ = temp1[0].split(':')[1]
@@ -645,12 +645,14 @@ def making_data_prepared(soup, homepage, usd, sh_driver):
     try:
         if element is None or not element['price']:
             change = sh_dic['price'] - sh_dic['ydp']
-            change_per = change / sh_dic['ydp']
+            # change_per = change / sh_dic['ydp']
+            change_per = round((change / sh_dic['ydp']) * 100, 2)
+
 
         else:
             last_price = element['price'][0]
             change = sh_dic['price'] - last_price
-            change_per = change / last_price
+            change_per = round((change / last_price) * 100, 2)
     except TypeError:
         if element is None or not element['price']:
             if sh_driver.find_element_by_xpath('//*[@id="d02"]').text.count(' ') > 1:
@@ -662,7 +664,9 @@ def making_data_prepared(soup, homepage, usd, sh_driver):
                 jj = sh_driver.find_element_by_xpath('//*[@id="d05"]').text
                 jj = float(jj.replace(',', ''))
             change = float(kk) - jj
-            change_per = change / jj
+            # change_per = change / jj
+            change_per = round((change / jj) * 100, 2)
+
         else:
             last_price = element['price'][0]
             if sh_driver.find_element_by_xpath('//*[@id="d02"]').text.count(' ') > 1:

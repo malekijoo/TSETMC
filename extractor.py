@@ -63,7 +63,8 @@ def bunch_(driver, soup):
         except exceptions.StaleElementReferenceException as e:
             # print(e)
             pass
-    print(" '{}' share successfully saved in dataframe.".format(instance.counter()))
+    instance.counter()
+    print("\n '{}' share successfully saved in dataframe.".format(instance.data_count))
     return shares_names
 
 
@@ -75,35 +76,37 @@ def single(sh_list):
     loop_ = 1
 
     while True:
-
-        if 1 < loop_ < 4 and len(sh_list) != 0:
+        if loop_ == 4:
+            next_phase = []
+        if 1 < loop_:
             sh_list = next_phase
         next_phase = []
         pbar = tqdm(sh_list, ncols=100)
         pbar.write("\nProcessing the list of share which is not in the original page. \n")
-        for ii, _ in enumerate(pbar, 0):
-            time_temp = pd.datetime.now()
-            min_ = time_temp.minute
-            sec_ = time_temp.second
-            if min_ % 10 == 0 and sec_ < 17:
-                homepage = bs(owss.url_source().content, 'lxml')
-                usd = owss.dollar_price()
+        if loop_ < 4:
+            for ii, _ in enumerate(pbar, 0):
+                time_temp = pd.datetime.now()
+                min_ = time_temp.minute
+                sec_ = time_temp.second
+                if min_ % 10 == 0 and sec_ < 17:
+                    homepage = bs(owss.url_source().content, 'lxml')
+                    usd = owss.dollar_price()
 
-            name = sh_list[ii]
-            try:
-                page = owss.page_loader(name)
-                html, sh_driver = page.shares_page
-                soup = bs(html, 'html.parser')
-                time.sleep(1)
-                # if not owss.check_share_condition(soup, sh_driver):
-                #     # print('this share ({}) is stopped for some reason.'.format(name))
-                df = owss.making_data_prepared(soup, homepage, usd, sh_driver)
-                share = owss.StockShare(**df)
-                check_and_store(share)
+                name = sh_list[ii]
+                try:
+                    page = owss.page_loader(name)
+                    html, sh_driver = page.shares_page
+                    soup = bs(html, 'html.parser')
+                    time.sleep(1)
+                    # if not owss.check_share_condition(soup, sh_driver):
+                    #     # print('this share ({}) is stopped for some reason.'.format(name))
+                    df = owss.making_data_prepared(soup, homepage, usd, sh_driver)
+                    share = owss.StockShare(**df)
+                    check_and_store(share)
 
-            except:
-                # print("the share ({}) did not respond currently, we will back to it in next phase.".format(name))
-                next_phase.append(name)
+                except:
+                    # print("the share ({}) did not respond currently, we will back to it in next phase.".format(name))
+                    next_phase.append(name)
 
         loop_ += 1
         if len(next_phase) == 0:
